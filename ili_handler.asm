@@ -22,22 +22,31 @@ my_ili_handler:
        
     xorq %rax, %rax
     xorq %rdi, %rdi
-    xorq %rbx, %rbx
-      
-    movq 120(%rsp), %rbx #loading the user code %rip into %rbx
-    movq (%rbx), %rbx
-    cmpb $0x0f, %bl
+    xorq %rcx, %rcx
+     
+    movq 120(%rsp), %rcx #loading the user code %rip into %rbx
+    movq (%rcx), %rcx
+    cmpb $0x0f, %cl
     jne one_byte_handler
-  
-one_byte_handler:
-    movb %bl, %dil
+    
+    movb %ch, %al
+    movq %rax, %rdi
     call what_to_do
     cmpq $0, %rax
-    jne default_handler
+    je default_handler
     jmp ill_handler_finish
+
+one_byte_handler:
+    movb %cl, %al
+    movq %rax, %rdi
+    call what_to_do
+    cmpq $0, %rax
+    jne ill_handler_finish
+    jmp default_handler
 
 ill_handler_finish:
     movq %rax, %rdi #save the returned value from what_to_do into %rdi like required
+
     popq %rsp
     popq %rbp
     popq %rsi
