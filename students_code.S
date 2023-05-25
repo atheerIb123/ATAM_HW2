@@ -132,6 +132,101 @@ end_shift:
 
 
 cipher:
+#calling keyMixing --- a ----
+    pushq %rdx	
+    pushq %rdi
+    pushq %rsi    
+    call keyMixing
+    popq %rsi
+    popq %rdi
+    popq %rdx
     
-    ret
+    xorq %rcx, %rcx
+    loop_nine_b:      #the loob of step b, 9 times
+        cmpq $9, %rcx
+        je loop_nine_b_end
+       #calling Byte Substitution
+         pushq %rdx	
+        pushq %rdi
+        pushq %rsi  
+        pushq %rcx
+        call byteSubstitution
+        popq %rcx
+        popq %rsi
+        popq %rdi
+        popq %rdx
+        
+       #calling Shift Rows
+        pushq %rdx	
+        pushq %rdi
+        pushq %rsi  
+        pushq %rcx
+        call shiftRows
+        popq %rcx
+        popq %rsi
+        popq %rdi
+        popq %rdx
+       
+        #calling mix columns
+        pushq %rdx	
+        pushq %rdi
+        pushq %rsi  
+        pushq %rcx
+        call mixColumns
+        popq %rcx
+        popq %rsi
+        popq %rdi
+        popq %rdx
+              
+       
+        pushq %rdx	
+        pushq %rdi
+        pushq %rsi
+        pushq %rcx
+        call keyMixing
+        popq %rcx
+        popq %rsi
+        popq %rdi
+        popq %rdx
+                
+        inc %rcx
+        jmp loop_nine_b
+    
+    
+    loop_nine_b_end:
 
+        pushq %rdx	
+        pushq %rdi
+        pushq %rsi
+        call byteSubstitution
+        popq %rsi
+        popq %rdi
+        popq %rdx     
+        
+           
+              
+        pushq %rdx	
+        pushq %rdi
+        pushq %rsi
+        call shiftRows
+        popq %rsi
+        popq %rdi
+        popq %rdx         
+    
+    
+        pushq %rdx	
+        pushq %rdi
+        pushq %rsi
+        call keyMixing
+        popq %rsi
+        popq %rdi
+        popq %rdx     
+        
+        
+        lea 16(%rdi), %rdi
+        dec %rdx
+        cmpq $0, %rdx
+        jne cipher
+    
+    
+        ret
